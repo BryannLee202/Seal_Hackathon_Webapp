@@ -7,6 +7,9 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    hikari:
+      connection-timeout: 20000
+      initialization-fail-timeout: 20000
   jpa:
     hibernate:
       ddl-auto: validate
@@ -20,6 +23,8 @@ spring:
     enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
+    connect-retries: 3
+    connect-retries-interval: 10
   servlet:
     multipart:
       max-file-size: 20MB
