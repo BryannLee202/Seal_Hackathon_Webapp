@@ -31,6 +31,11 @@ public class TrackController {
         return trackService.listByEvent(eventId);
     }
 
+    @GetMapping("/api/tracks/{trackId}")
+    public TrackResponse get(@PathVariable UUID trackId) {
+        return trackService.get(trackId);
+    }
+
     @PutMapping("/api/tracks/{trackId}")
     @PreAuthorize("hasRole('COORDINATOR')")
     public TrackResponse update(@PathVariable UUID trackId, @Valid @RequestBody TrackRequest request) {

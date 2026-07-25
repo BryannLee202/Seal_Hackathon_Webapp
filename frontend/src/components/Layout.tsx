@@ -1,7 +1,17 @@
 import type { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { IconCalendar, IconGavel, IconHome, IconLogOut, IconShieldCheck, IconTrophy, IconUsers } from "./icons";
+import {
+  IconCalendar,
+  IconGavel,
+  IconHistory,
+  IconHome,
+  IconLogOut,
+  IconMessageCircle,
+  IconShieldCheck,
+  IconTrophy,
+  IconUsers,
+} from "./icons";
 
 interface NavItem {
   to: string;
@@ -21,6 +31,7 @@ export function Layout({ children }: { children: ReactNode }) {
     navItems.push(
       { to: "/coordinator/events", label: "Quản lý sự kiện", icon: <IconCalendar /> },
       { to: "/coordinator/users", label: "Duyệt tài khoản", icon: <IconShieldCheck /> },
+      { to: "/coordinator/audit-log", label: "Nhật ký kiểm tra", icon: <IconHistory /> },
     );
   }
   if (hasRole("TEAM_MEMBER") || hasRole("TEAM_LEADER")) {
@@ -28,6 +39,9 @@ export function Layout({ children }: { children: ReactNode }) {
   }
   if (hasRole("JUDGE")) {
     navItems.push({ to: "/judge", label: "Chấm điểm", icon: <IconGavel /> });
+  }
+  if (hasRole("MENTOR")) {
+    navItems.push({ to: "/mentor", label: "Đội được phân công", icon: <IconMessageCircle /> });
   }
 
   async function handleLogout() {

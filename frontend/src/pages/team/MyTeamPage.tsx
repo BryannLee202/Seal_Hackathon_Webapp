@@ -3,6 +3,7 @@ import { api } from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 import type { EventItem, RoundItem, SubmissionItem, TeamInviteItem, TeamItem, TrackItem } from "../../api/types";
 import { Wizard, type WizardStep } from "../../components/Wizard";
+import { FeedbackThread } from "../../components/FeedbackThread";
 
 export function MyTeamPage() {
   const { user, refreshPermissions } = useAuth();
@@ -258,6 +259,11 @@ function TeamCard({
           ))}
         </div>
       )}
+
+      <div className="section-gap">
+        <div className="card-title">Trao đổi với Mentor</div>
+        <FeedbackThread teamId={team.id} />
+      </div>
     </div>
   );
 }

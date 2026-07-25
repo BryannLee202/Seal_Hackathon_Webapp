@@ -1,7 +1,7 @@
 package com.seal.hackathon.controller;
 
 import com.seal.hackathon.dto.audit.AuditLogResponse;
-import com.seal.hackathon.repository.AuditLogRepository;
+import com.seal.hackathon.service.AuditLogQueryService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,10 +17,10 @@ import java.util.UUID;
 @PreAuthorize("hasRole('COORDINATOR')")
 public class AuditLogController {
 
-    private final AuditLogRepository auditLogRepository;
+    private final AuditLogQueryService auditLogQueryService;
 
-    public AuditLogController(AuditLogRepository auditLogRepository) {
-        this.auditLogRepository = auditLogRepository;
+    public AuditLogController(AuditLogQueryService auditLogQueryService) {
+        this.auditLogQueryService = auditLogQueryService;
     }
 
     @GetMapping
@@ -30,7 +30,14 @@ public class AuditLogController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size
     ) {
-        return auditLogRepository.findByEntityTypeAndEntityId(entityType, entityId, PageRequest.of(page, size))
-                .map(AuditLogResponse::from);
+        return auditLogQueryService.listByEntity(entityType, entityId, PageRequest.of(page, size));
+    }
+
+    @GetMapping("/recent")
+    public Page<AuditLogResponse> listRecent(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size
+    ) {
+        return auditLogQueryService.listRecent(page, size);
     }
 }

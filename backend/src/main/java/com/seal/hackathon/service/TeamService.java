@@ -124,6 +124,16 @@ public class TeamService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<TeamResponse> listByTracks(List<UUID> trackIds) {
+        if (trackIds.isEmpty()) {
+            return List.of();
+        }
+        return teamRepository.findByTrackIdIn(trackIds).stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public TeamInviteResponse invite(UUID teamId, TeamInviteRequest request, UUID requesterUserId) {
         Team team = findOrThrow(teamId);

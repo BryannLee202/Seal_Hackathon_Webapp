@@ -807,6 +807,75 @@ tbody tr:last-child td {
   .skeleton-line { animation: none; }
 }
 
+/* ---------- Audit log timeline ---------- */
+
+.audit-timeline {
+  position: relative;
+  padding-left: 4px;
+}
+
+.audit-timeline-item {
+  display: flex;
+  gap: 16px;
+  position: relative;
+  padding-bottom: 22px;
+}
+
+.audit-timeline-item::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 16px;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-border-soft);
+}
+
+.audit-timeline-item:last-child::before {
+  display: none;
+}
+
+.audit-timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px var(--color-surface);
+  z-index: 1;
+}
+
+.badge-dot-success { background: var(--color-success); }
+.badge-dot-danger { background: var(--color-danger); }
+.badge-dot-warning { background: var(--color-warning); }
+.badge-dot-info { background: var(--color-info); }
+.badge-dot-primary { background: var(--color-primary); }
+.badge-dot-neutral { background: var(--color-text-muted); }
+
+.audit-timeline-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.audit-timeline-details {
+  margin-top: 8px;
+}
+
+.audit-timeline-details summary {
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.audit-timeline-details code {
+  font-size: 11.5px;
+  background: var(--color-bg);
+  padding: 8px 10px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
 /* ---------- Score slider (judge scoring) ---------- */
 
 .score-slider {
@@ -2026,4 +2095,52 @@ html {
 
 .l-footer .muted {
   color: var(--l-text-muted);
+}
+
+/* Voting page */
+
+.l-vote-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.l-vote-tab.active {
+  background: var(--l-accent);
+  border-color: var(--l-accent);
+  color: var(--l-bg);
+}
+
+.l-vote-count {
+  font-family: "Lexend", sans-serif;
+  font-weight: 800;
+  font-size: 32px;
+  color: var(--l-accent);
+  margin: 14px 0 4px;
+}
+
+.l-vote-count-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--l-text-muted);
+}
+
+.l-vote-voted-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--l-accent);
+  margin-top: 14px;
+}
+
+.l-btn-primary:disabled,
+.l-btn-ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
 }

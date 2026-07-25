@@ -6,6 +6,10 @@ import { AppModule } from "./app.module";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Needed so req.ip reflects the real visitor IP (from X-Forwarded-For) instead of
+  // Render's internal proxy address - required for the voting anti-abuse IP rate cap.
+  app.getHttpAdapter().getInstance().set("trust proxy", true);
+
   app.use(cookieParser());
 
   const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS ?? "http://localhost:3000").split(",");

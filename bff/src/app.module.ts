@@ -6,13 +6,14 @@ import { AuthService } from "./auth/auth.service";
 import { DashboardController } from "./proxy/dashboard.controller";
 import { ProxyController } from "./proxy/proxy.controller";
 import { ProxyService } from "./proxy/proxy.service";
+import { VotingController } from "./voting/voting.controller";
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     HttpModule.register({ timeout: 15000 }),
   ],
-  controllers: [AuthController, DashboardController, ProxyController],
+  controllers: [AuthController, DashboardController, VotingController, ProxyController],
   providers: [AuthService, ProxyService],
 })
 export class AppModule {}

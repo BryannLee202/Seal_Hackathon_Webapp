@@ -29,4 +29,25 @@ export class ProxyService {
       throw new HttpException({ message: "Backend unreachable" }, 502);
     }
   }
+
+  /** Like forward(), but with arbitrary extra headers instead of a Bearer token (e.g. anonymous-voter plumbing). */
+  async forwardWithHeaders(method: Method, path: string, headers: Record<string, string>, data?: unknown) {
+    try {
+      const response = await firstValueFrom(
+        this.http.request({
+          method,
+          url: `${this.backendUrl}${path}`,
+          data,
+          headers,
+        }),
+      );
+      return { status: response.status, data: response.data };
+    } catch (err) {
+      const axiosErr = err as AxiosError;
+      if (axiosErr.response) {
+        throw new HttpException(axiosErr.response.data as object, axiosErr.response.status);
+      }
+      throw new HttpException({ message: "Backend unreachable" }, 502);
+    }
+  }
 }

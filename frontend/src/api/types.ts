@@ -182,6 +182,59 @@ export interface CalibrationScoreEntry {
   scoreValue: number;
 }
 
+export type AuditAction =
+  | "ACCOUNT_REGISTER"
+  | "ACCOUNT_APPROVE"
+  | "ACCOUNT_REJECT"
+  | "GUEST_JUDGE_CREATE"
+  | "SCORE_CREATE"
+  | "SCORE_UPDATE"
+  | "SCORE_FINALIZE"
+  | "TEAM_DISQUALIFY"
+  | "SUBMISSION_DISQUALIFY"
+  | "JUDGE_ASSIGN"
+  | "MENTOR_ASSIGN"
+  | "RANKING_COMPUTE"
+  | "PROMOTION_COMPUTE"
+  | "PRIZE_AWARD"
+  | "RESULT_PUBLISH"
+  | "MENTOR_MESSAGE_SEND"
+  | "VOTE_CAST";
+
+export interface AuditLogItem {
+  id: string;
+  actorName: string;
+  action: AuditAction;
+  entityType: string;
+  entityId: string | null;
+  oldValueJson: string | null;
+  newValueJson: string | null;
+  timestamp: string;
+}
+
+export type FeedbackAuthorRole = "MENTOR" | "TEAM_MEMBER";
+
+export interface FeedbackMessageItem {
+  id: string;
+  teamId: string;
+  authorUserId: string;
+  authorName: string;
+  authorRole: FeedbackAuthorRole;
+  body: string;
+  createdAt: string;
+}
+
+export interface PublicTeamItem {
+  id: string;
+  name: string;
+}
+
+export interface VoteTallyItem {
+  teamId: string;
+  teamName: string;
+  voteCount: number;
+}
+
 export interface PrizeItem {
   id: string;
   eventId: string;

@@ -4,6 +4,7 @@ import com.seal.hackathon.domain.enums.JudgeType;
 import com.seal.hackathon.domain.enums.RoleName;
 import com.seal.hackathon.domain.enums.ScopeType;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +70,35 @@ public class JwtService {
                 .expiration(new Date(now.getTime() + refreshTokenExpirationMs))
                 .signWith(signingKey)
                 .compact();
+    }
+
+    private static final long VOTER_TOKEN_TTL_MS = 180L * 24 * 60 * 60 * 1000; // 180 ngày
+
+    /** Token ẩn danh cho khán giả bình chọn - không gắn với tài khoản User nào, chỉ để chống bình chọn trùng. */
+    public String generateVoterToken(UUID voterId) {
+        Date now = new Date();
+        return Jwts.builder()
+                .subject(voterId.toString())
+                .claim("type", "voter")
+                .issuedAt(now)
+                .expiration(new Date(now.getTime() + VOTER_TOKEN_TTL_MS))
+                .signWith(signingKey)
+                .compact();
+    }
+
+    /** Khôi phục danh tính người bình chọn từ token cũ (nếu hợp lệ), hoặc tạo danh tính mới. */
+    public UUID resolveOrCreateVoterId(String incomingToken) {
+        if (incomingToken != null && !incomingToken.isBlank()) {
+            try {
+                Claims claims = parseClaims(incomingToken);
+                if ("voter".equals(claims.get("type", String.class))) {
+                    return UUID.fromString(claims.getSubject());
+                }
+            } catch (JwtException | IllegalArgumentException ignored) {
+                // Token hết hạn/giả mạo/hỏng -> coi như người bình chọn mới
+            }
+        }
+        return UUID.randomUUID();
     }
 
     public Claims parseClaims(String token) {

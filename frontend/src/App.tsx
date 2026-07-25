@@ -8,9 +8,12 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { EventsPage } from "./pages/coordinator/EventsPage";
 import { EventDetailPage } from "./pages/coordinator/EventDetailPage";
 import { UsersApprovalPage } from "./pages/coordinator/UsersApprovalPage";
+import { AuditLogPage } from "./pages/coordinator/AuditLogPage";
+import { MentorDashboardPage } from "./pages/mentor/MentorDashboardPage";
 import { MyTeamPage } from "./pages/team/MyTeamPage";
 import { JudgePage } from "./pages/judge/JudgePage";
 import { RankingPage } from "./pages/public/RankingPage";
+import { VotingPage } from "./pages/public/VotingPage";
 import { ToastContainer } from "./components/Toast";
 
 export default function App() {
@@ -22,6 +25,7 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/vote" element={<VotingPage />} />
 
           <Route
             path="/app"
@@ -56,6 +60,14 @@ export default function App() {
             }
           />
           <Route
+            path="/mentor"
+            element={
+              <ProtectedRoute requireRole="MENTOR">
+                <MentorDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/coordinator/events"
             element={
               <ProtectedRoute requireRole="COORDINATOR">
@@ -76,6 +88,14 @@ export default function App() {
             element={
               <ProtectedRoute requireRole="COORDINATOR">
                 <UsersApprovalPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/coordinator/audit-log"
+            element={
+              <ProtectedRoute requireRole="COORDINATOR">
+                <AuditLogPage />
               </ProtectedRoute>
             }
           />

@@ -44,6 +44,11 @@ public class TrackService {
         return trackRepository.findByEventId(eventId).stream().map(TrackResponse::from).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public TrackResponse get(UUID trackId) {
+        return TrackResponse.from(findOrThrow(trackId));
+    }
+
     @Transactional
     public TrackResponse update(UUID trackId, TrackRequest request) {
         Track track = findOrThrow(trackId);

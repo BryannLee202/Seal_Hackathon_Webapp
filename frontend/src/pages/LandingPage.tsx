@@ -415,6 +415,7 @@ function LandingNav({ loggedIn }: { loggedIn: boolean }) {
           <a href="#timeline">Lộ trình</a>
           <a href="#criteria">Tiêu chí</a>
           <a href="#roles">Vai trò</a>
+          <Link to="/vote">Bình chọn</Link>
         </nav>
         <div className="l-nav-actions">
           {loggedIn ? (
