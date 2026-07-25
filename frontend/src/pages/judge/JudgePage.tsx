@@ -11,6 +11,7 @@ import type {
 } from "../../api/types";
 import { EmptyState } from "../../components/EmptyState";
 import { toast } from "../../components/Toast";
+import { ScoreSlider } from "../../components/ScoreSlider";
 
 export function JudgePage() {
   const { user, refreshPermissions } = useAuth();
@@ -96,11 +97,11 @@ function CalibrationForm({
   calibrationRound: CalibrationRoundItem;
   criteria: CriterionItem[];
 }) {
-  const [values, setValues] = useState<Record<string, string>>({});
+  const [values, setValues] = useState<Record<string, number>>({});
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const items = criteria.map((c) => ({ criterionId: c.id, scoreValue: Number(values[c.id] ?? 0) }));
+    const items = criteria.map((c) => ({ criterionId: c.id, scoreValue: values[c.id] ?? 0 }));
     try {
       await api.put(`/api/calibration-rounds/${calibrationRound.id}/scores`, items);
       toast.success("Đã gửi điểm hiệu chuẩn.");
@@ -112,23 +113,16 @@ function CalibrationForm({
   return (
     <form onSubmit={submit} className="section-gap" style={{ background: "var(--color-bg)", padding: 14, borderRadius: 8 }}>
       <strong>{calibrationRound.name}</strong>
-      <div className="grid grid-2">
+      <div className="grid grid-2 section-gap">
         {criteria.map((c) => (
-          <div className="form-row" key={c.id}>
-            <label>
-              {c.name} (0 - {c.maxScore})
-            </label>
-            <input
-              type="number"
-              min={0}
-              max={c.maxScore}
-              step={0.5}
-              required
-              className="score-input"
-              value={values[c.id] ?? ""}
-              onChange={(e) => setValues((v) => ({ ...v, [c.id]: e.target.value }))}
-            />
-          </div>
+          <ScoreSlider
+            key={c.id}
+            id={`calib-${calibrationRound.id}-${c.id}`}
+            label={c.name}
+            max={Number(c.maxScore)}
+            value={values[c.id] ?? 0}
+            onChange={(v) => setValues((prev) => ({ ...prev, [c.id]: v }))}
+          />
         ))}
       </div>
       <button className="btn small" type="submit" style={{ alignSelf: "flex-start" }}>
@@ -177,7 +171,7 @@ function RoundScoringSection({ roundId }: { roundId: string }) {
 
 function SubmissionScoreCard({ submission, criteria }: { submission: SubmissionItem; criteria: CriterionItem[] }) {
   const [existingScores, setExistingScores] = useState<ScoreItem[]>([]);
-  const [values, setValues] = useState<Record<string, string>>({});
+  const [values, setValues] = useState<Record<string, number>>({});
   const [comments, setComments] = useState<Record<string, string>>({});
   const [finalized, setFinalized] = useState(true);
   const [expanded, setExpanded] = useState(false);
@@ -185,10 +179,10 @@ function SubmissionScoreCard({ submission, criteria }: { submission: SubmissionI
   useEffect(() => {
     api.get<ScoreItem[]>(`/api/submissions/${submission.id}/scores`).then((res) => {
       setExistingScores(res.data);
-      const v: Record<string, string> = {};
+      const v: Record<string, number> = {};
       const c: Record<string, string> = {};
       res.data.forEach((s) => {
-        v[s.criterionId] = String(s.scoreValue);
+        v[s.criterionId] = s.scoreValue;
         c[s.criterionId] = s.comment ?? "";
       });
       setValues(v);
@@ -197,6 +191,12 @@ function SubmissionScoreCard({ submission, criteria }: { submission: SubmissionI
   }, [submission.id]);
 
   const myFinalizedCount = existingScores.filter((s) => s.finalized).length;
+  const totalWeighted = criteria.reduce((sum, c) => {
+    const max = Number(c.maxScore);
+    const v = values[c.id] ?? 0;
+    const weight = Number(c.weight);
+    return sum + (max > 0 ? (v / max) * weight : 0);
+  }, 0);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -208,7 +208,7 @@ function SubmissionScoreCard({ submission, criteria }: { submission: SubmissionI
     }
     const items = criteria.map((c) => ({
       criterionId: c.id,
-      scoreValue: Number(values[c.id] ?? 0),
+      scoreValue: values[c.id] ?? 0,
       comment: comments[c.id] ?? undefined,
     }));
     try {
@@ -250,29 +250,31 @@ function SubmissionScoreCard({ submission, criteria }: { submission: SubmissionI
           </div>
 
           <form onSubmit={submit} className="section-gap">
+            <div className="flex between" style={{ marginBottom: 4 }}>
+              <span className="muted" style={{ fontSize: 12.5, fontWeight: 700 }}>
+                TỔNG ĐIỂM TRỌNG SỐ (ƯỚC TÍNH)
+              </span>
+              <span style={{ fontFamily: "Lexend, sans-serif", fontWeight: 800, fontSize: 20, color: "var(--color-primary-dark)" }}>
+                {totalWeighted.toFixed(1)}
+                <small style={{ fontSize: 13, color: "var(--color-text-muted)" }}>/100</small>
+              </span>
+            </div>
             {criteria.map((c) => (
-              <div className="form-row" key={c.id}>
-                <label>
-                  {c.name} (0 - {c.maxScore}, trọng số {c.weight}%)
-                </label>
-                <div className="flex score-row">
-                  <input
-                    type="number"
-                    min={0}
-                    max={c.maxScore}
-                    step={0.5}
-                    required
-                    className="score-input"
-                    style={{ width: 100 }}
-                    value={values[c.id] ?? ""}
-                    onChange={(e) => setValues((v) => ({ ...v, [c.id]: e.target.value }))}
-                  />
-                  <input
-                    placeholder="Nhận xét (tuỳ chọn)"
-                    value={comments[c.id] ?? ""}
-                    onChange={(e) => setComments((v) => ({ ...v, [c.id]: e.target.value }))}
-                  />
-                </div>
+              <div key={c.id}>
+                <ScoreSlider
+                  id={`score-${submission.id}-${c.id}`}
+                  label={c.name}
+                  max={Number(c.maxScore)}
+                  weight={Number(c.weight)}
+                  value={values[c.id] ?? 0}
+                  onChange={(v) => setValues((prev) => ({ ...prev, [c.id]: v }))}
+                />
+                <input
+                  placeholder="Nhận xét (tuỳ chọn)"
+                  style={{ marginTop: -6, marginBottom: 12 }}
+                  value={comments[c.id] ?? ""}
+                  onChange={(e) => setComments((v) => ({ ...v, [c.id]: e.target.value }))}
+                />
               </div>
             ))}
             <div className="form-row inline">

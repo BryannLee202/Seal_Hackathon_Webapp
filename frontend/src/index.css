@@ -807,28 +807,114 @@ tbody tr:last-child td {
   .skeleton-line { animation: none; }
 }
 
-/* ---------- Score input ---------- */
+/* ---------- Score slider (judge scoring) ---------- */
 
-input[type="number"].score-input {
-  text-align: right;
-  -moz-appearance: textfield;
+.score-slider {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 12px;
 }
 
-input[type="number"].score-input::-webkit-outer-spin-button,
-input[type="number"].score-input::-webkit-inner-spin-button {
+.score-slider-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.score-slider-head label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.score-slider-weight {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.score-slider-value {
+  font-family: "Lexend", sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-primary-dark);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.score-slider-value small {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  margin-left: 2px;
+}
+
+.score-range {
   -webkit-appearance: none;
-  margin: 0;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--color-primary) var(--fill, 0%), var(--color-border) var(--fill, 0%));
+  outline: none;
+  cursor: pointer;
 }
 
-@media (max-width: 480px) {
-  .score-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
+.score-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  border: 3px solid white;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
 
-  .score-row input[type="number"].score-input {
-    width: 100% !important;
-  }
+.score-range::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+}
+
+.score-range::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  border: 3px solid white;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+}
+
+.score-range::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-border);
+}
+
+.score-range::-moz-range-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-primary);
+}
+
+.score-slider-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+  font-weight: 600;
 }
 
 /* ---------- Wizard (step-by-step forms) ---------- */
