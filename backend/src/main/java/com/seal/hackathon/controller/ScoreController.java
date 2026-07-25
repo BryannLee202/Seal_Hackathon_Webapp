@@ -33,7 +33,7 @@ public class ScoreController {
     }
 
     @GetMapping
-    public List<ScoreResponse> list(@PathVariable UUID submissionId) {
-        return scoreService.listBySubmission(submissionId);
+    public List<ScoreResponse> list(@PathVariable UUID submissionId, @AuthenticationPrincipal AuthenticatedPrincipal principal) {
+        return scoreService.listBySubmission(submissionId, principal);
     }
 }

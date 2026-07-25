@@ -4,6 +4,8 @@ import com.seal.hackathon.domain.entity.Round;
 import com.seal.hackathon.domain.entity.Submission;
 import com.seal.hackathon.domain.entity.Team;
 import com.seal.hackathon.domain.entity.TeamMember;
+import com.seal.hackathon.domain.enums.RoleName;
+import com.seal.hackathon.domain.enums.ScopeType;
 import com.seal.hackathon.domain.enums.TeamMemberRole;
 import com.seal.hackathon.dto.submission.SubmissionRequest;
 import com.seal.hackathon.dto.submission.SubmissionResponse;
@@ -11,13 +13,14 @@ import com.seal.hackathon.exception.ApiException;
 import com.seal.hackathon.repository.SubmissionRepository;
 import com.seal.hackathon.repository.TeamMemberRepository;
 import com.seal.hackathon.repository.TeamRepository;
+import com.seal.hackathon.security.AuthenticatedPrincipal;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class SubmissionService {
@@ -26,17 +29,20 @@ public class SubmissionService {
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final RoundService roundService;
+    private final JudgeAssignmentService judgeAssignmentService;
 
     public SubmissionService(
             SubmissionRepository submissionRepository,
             TeamRepository teamRepository,
             TeamMemberRepository teamMemberRepository,
-            RoundService roundService
+            RoundService roundService,
+            JudgeAssignmentService judgeAssignmentService
     ) {
         this.submissionRepository = submissionRepository;
         this.teamRepository = teamRepository;
         this.teamMemberRepository = teamMemberRepository;
         this.roundService = roundService;
+        this.judgeAssignmentService = judgeAssignmentService;
     }
 
     @Transactional
@@ -72,23 +78,52 @@ public class SubmissionService {
     }
 
     @Transactional(readOnly = true)
-    public List<SubmissionResponse> listByRound(UUID roundId) {
-        return submissionRepository.findByRoundId(roundId).stream()
-                .map(SubmissionResponse::from)
-                .collect(Collectors.toList());
+    public Page<SubmissionResponse> listByRound(UUID roundId, AuthenticatedPrincipal principal, Pageable pageable) {
+        assertCanViewRound(roundId, principal);
+        return submissionRepository.findByRoundId(roundId, pageable).map(SubmissionResponse::from);
     }
 
     @Transactional(readOnly = true)
-    public SubmissionResponse getByTeamAndRound(UUID teamId, UUID roundId) {
-        return submissionRepository.findByTeamIdAndRoundId(teamId, roundId)
-                .map(SubmissionResponse::from)
+    public SubmissionResponse getByTeamAndRound(UUID teamId, UUID roundId, AuthenticatedPrincipal principal) {
+        Submission submission = submissionRepository.findByTeamIdAndRoundId(teamId, roundId)
                 .orElseThrow(() -> ApiException.notFound("Đội chưa nộp bài cho vòng thi này"));
+        assertCanView(submission, principal);
+        return SubmissionResponse.from(submission);
     }
 
     @Transactional(readOnly = true)
-    public SubmissionResponse get(UUID submissionId) {
-        return submissionRepository.findById(submissionId)
-                .map(SubmissionResponse::from)
+    public SubmissionResponse get(UUID submissionId, AuthenticatedPrincipal principal) {
+        Submission submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> ApiException.notFound("Không tìm thấy bài nộp"));
+        assertCanView(submission, principal);
+        return SubmissionResponse.from(submission);
+    }
+
+    private void assertCanView(Submission submission, AuthenticatedPrincipal principal) {
+        Team team = submission.getTeam();
+        if (principal.isCoordinator()) {
+            return;
+        }
+        if (teamMemberRepository.existsByTeamIdAndUserId(team.getId(), principal.userId())) {
+            return;
+        }
+        if (judgeAssignmentService.isJudgeAssignedToRound(principal.userId(), submission.getRound().getId())) {
+            return;
+        }
+        if (team.getTrack() != null
+                && principal.hasRoleInScope(RoleName.MENTOR, ScopeType.TRACK, team.getTrack().getId())) {
+            return;
+        }
+        throw ApiException.forbidden("Bạn không có quyền xem bài nộp này");
+    }
+
+    private void assertCanViewRound(UUID roundId, AuthenticatedPrincipal principal) {
+        if (principal.isCoordinator()) {
+            return;
+        }
+        if (judgeAssignmentService.isJudgeAssignedToRound(principal.userId(), roundId)) {
+            return;
+        }
+        throw ApiException.forbidden("Bạn không có quyền xem danh sách bài nộp của vòng thi này");
     }
 }

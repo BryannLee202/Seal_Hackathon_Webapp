@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api } from "../../api/client";
-import type { CalibrationRoundItem, CalibrationScoreEntry, RoundItem, SubmissionItem } from "../../api/types";
+import type { CalibrationRoundItem, CalibrationScoreEntry, Page, RoundItem, SubmissionItem } from "../../api/types";
 
 interface SubmissionOption extends SubmissionItem {
   roundName: string;
@@ -24,8 +24,8 @@ export function CalibrationTab({ eventId }: { eventId: string }) {
 
     const options: SubmissionOption[] = [];
     for (const round of roundsRes.data) {
-      const subs = await api.get<SubmissionItem[]>(`/api/rounds/${round.id}/submissions`);
-      subs.data.forEach((s) => options.push({ ...s, roundName: round.name }));
+      const subs = await api.get<Page<SubmissionItem>>(`/api/rounds/${round.id}/submissions`);
+      subs.data.content.forEach((s) => options.push({ ...s, roundName: round.name }));
     }
     setSubmissionOptions(options);
     if (!sampleSubmissionId && options.length > 0) setSampleSubmissionId(options[0].id);

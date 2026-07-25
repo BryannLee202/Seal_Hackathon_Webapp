@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import type {
   CalibrationRoundItem,
   CriterionItem,
+  Page,
   RoundItem,
   ScoreItem,
   SubmissionItem,
@@ -146,11 +147,11 @@ function RoundScoringSection({ roundId }: { roundId: string }) {
     const [r, c, s] = await Promise.all([
       api.get<RoundItem>(`/api/rounds/${roundId}`),
       api.get<CriterionItem[]>(`/api/rounds/${roundId}/criteria`),
-      api.get<SubmissionItem[]>(`/api/rounds/${roundId}/submissions`),
+      api.get<Page<SubmissionItem>>(`/api/rounds/${roundId}/submissions`),
     ]);
     setRound(r.data);
     setCriteria(c.data);
-    setSubmissions(s.data);
+    setSubmissions(s.data.content);
   }
 
   useEffect(() => {

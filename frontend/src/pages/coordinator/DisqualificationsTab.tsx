@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api } from "../../api/client";
-import type { RoundItem, SubmissionItem, TeamItem } from "../../api/types";
+import type { Page, RoundItem, SubmissionItem, TeamItem } from "../../api/types";
 
 interface DisqualificationEntry {
   id: string;
@@ -26,16 +26,16 @@ export function DisqualificationsTab({ eventId }: { eventId: string }) {
   async function load() {
     const [entriesRes, teamsRes, roundsRes] = await Promise.all([
       api.get<DisqualificationEntry[]>(`/api/events/${eventId}/disqualifications`),
-      api.get<TeamItem[]>(`/api/events/${eventId}/teams`),
+      api.get<Page<TeamItem>>(`/api/events/${eventId}/teams`),
       api.get<RoundItem[]>(`/api/events/${eventId}/rounds`),
     ]);
     setEntries(entriesRes.data);
-    setTeams(teamsRes.data);
+    setTeams(teamsRes.data.content);
 
     const subs: (SubmissionItem & { roundName: string })[] = [];
     for (const round of roundsRes.data) {
-      const res = await api.get<SubmissionItem[]>(`/api/rounds/${round.id}/submissions`);
-      res.data.forEach((s) => subs.push({ ...s, roundName: round.name }));
+      const res = await api.get<Page<SubmissionItem>>(`/api/rounds/${round.id}/submissions`);
+      res.data.content.forEach((s) => subs.push({ ...s, roundName: round.name }));
     }
     setSubmissions(subs);
   }

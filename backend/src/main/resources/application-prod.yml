@@ -1,0 +1,8 @@
+# Cấu hình cho môi trường production. Kích hoạt bằng SPRING_PROFILES_ACTIVE=prod.
+# Không có giá trị mặc định cho secret/credential - ứng dụng sẽ báo lỗi và không khởi động
+# nếu thiếu DB_URL, DB_USERNAME, DB_PASSWORD, JWT_SECRET, CORS_ALLOWED_ORIGINS.
+# Điều này bắt buộc người vận hành phải tự cấu hình giá trị thật, tránh vô tình dùng secret dev.
+logging:
+  level:
+    com.seal.hackathon: INFO
+    org.springframework.security: WARN

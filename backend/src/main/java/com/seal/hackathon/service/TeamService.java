@@ -6,6 +6,8 @@ import com.seal.hackathon.domain.entity.TeamInvite;
 import com.seal.hackathon.domain.entity.TeamMember;
 import com.seal.hackathon.domain.entity.Track;
 import com.seal.hackathon.domain.entity.User;
+import com.seal.hackathon.domain.enums.RoleName;
+import com.seal.hackathon.domain.enums.ScopeType;
 import com.seal.hackathon.domain.enums.TeamInviteStatus;
 import com.seal.hackathon.domain.enums.TeamMemberRole;
 import com.seal.hackathon.domain.enums.TeamStatus;
@@ -21,6 +23,9 @@ import com.seal.hackathon.repository.TeamMemberRepository;
 import com.seal.hackathon.repository.TeamRepository;
 import com.seal.hackathon.repository.TrackRepository;
 import com.seal.hackathon.repository.UserRepository;
+import com.seal.hackathon.security.AuthenticatedPrincipal;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,13 +92,29 @@ public class TeamService {
     }
 
     @Transactional(readOnly = true)
-    public TeamResponse get(UUID teamId) {
-        return toResponse(findOrThrow(teamId));
+    public TeamResponse get(UUID teamId, AuthenticatedPrincipal principal) {
+        Team team = findOrThrow(teamId);
+        assertCanView(team, principal);
+        return toResponse(team);
+    }
+
+    private void assertCanView(Team team, AuthenticatedPrincipal principal) {
+        if (principal.isCoordinator()) {
+            return;
+        }
+        if (teamMemberRepository.existsByTeamIdAndUserId(team.getId(), principal.userId())) {
+            return;
+        }
+        if (team.getTrack() != null
+                && principal.hasRoleInScope(RoleName.MENTOR, ScopeType.TRACK, team.getTrack().getId())) {
+            return;
+        }
+        throw ApiException.forbidden("Bạn không có quyền xem thông tin đội này");
     }
 
     @Transactional(readOnly = true)
-    public List<TeamResponse> listByEvent(UUID eventId) {
-        return teamRepository.findByEventId(eventId).stream().map(this::toResponse).collect(Collectors.toList());
+    public Page<TeamResponse> listByEvent(UUID eventId, Pageable pageable) {
+        return teamRepository.findByEventId(eventId, pageable).map(this::toResponse);
     }
 
     @Transactional(readOnly = true)

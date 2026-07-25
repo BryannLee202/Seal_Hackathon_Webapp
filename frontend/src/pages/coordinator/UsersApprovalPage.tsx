@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api } from "../../api/client";
-import type { UserSummary } from "../../api/types";
+import type { Page, UserSummary } from "../../api/types";
 
 const categoryLabel: Record<string, string> = {
   FPT_STUDENT: "Sinh viên FPT",
@@ -26,8 +26,8 @@ export function UsersApprovalPage() {
   const [createdGuest, setCreatedGuest] = useState<GuestJudgeCreated | null>(null);
 
   async function load() {
-    const { data } = await api.get<UserSummary[]>("/api/admin/users/pending");
-    setPending(data);
+    const { data } = await api.get<Page<UserSummary>>("/api/admin/users/pending");
+    setPending(data.content);
   }
 
   useEffect(() => {

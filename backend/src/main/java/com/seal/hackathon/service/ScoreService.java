@@ -4,8 +4,11 @@ import com.seal.hackathon.domain.entity.CalibrationRound;
 import com.seal.hackathon.domain.entity.Criterion;
 import com.seal.hackathon.domain.entity.Score;
 import com.seal.hackathon.domain.entity.Submission;
+import com.seal.hackathon.domain.entity.Team;
 import com.seal.hackathon.domain.entity.User;
 import com.seal.hackathon.domain.enums.AuditAction;
+import com.seal.hackathon.domain.enums.RoleName;
+import com.seal.hackathon.domain.enums.ScopeType;
 import com.seal.hackathon.dto.scoring.ScoreBatchRequest;
 import com.seal.hackathon.dto.scoring.ScoreItemRequest;
 import com.seal.hackathon.dto.scoring.ScoreResponse;
@@ -15,7 +18,9 @@ import com.seal.hackathon.repository.CalibrationScoreRepository;
 import com.seal.hackathon.repository.CriterionRepository;
 import com.seal.hackathon.repository.ScoreRepository;
 import com.seal.hackathon.repository.SubmissionRepository;
+import com.seal.hackathon.repository.TeamMemberRepository;
 import com.seal.hackathon.repository.UserRepository;
+import com.seal.hackathon.security.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +41,7 @@ public class ScoreService {
     private final CalibrationScoreRepository calibrationScoreRepository;
     private final JudgeAssignmentService judgeAssignmentService;
     private final AuditService auditService;
+    private final TeamMemberRepository teamMemberRepository;
 
     public ScoreService(
             ScoreRepository scoreRepository,
@@ -45,7 +51,8 @@ public class ScoreService {
             CalibrationRoundRepository calibrationRoundRepository,
             CalibrationScoreRepository calibrationScoreRepository,
             JudgeAssignmentService judgeAssignmentService,
-            AuditService auditService
+            AuditService auditService,
+            TeamMemberRepository teamMemberRepository
     ) {
         this.scoreRepository = scoreRepository;
         this.submissionRepository = submissionRepository;
@@ -55,6 +62,7 @@ public class ScoreService {
         this.calibrationScoreRepository = calibrationScoreRepository;
         this.judgeAssignmentService = judgeAssignmentService;
         this.auditService = auditService;
+        this.teamMemberRepository = teamMemberRepository;
     }
 
     @Transactional
@@ -102,9 +110,33 @@ public class ScoreService {
     }
 
     @Transactional(readOnly = true)
-    public List<ScoreResponse> listBySubmission(UUID submissionId) {
+    public List<ScoreResponse> listBySubmission(UUID submissionId, AuthenticatedPrincipal principal) {
+        Submission submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> ApiException.notFound("Không tìm thấy bài nộp"));
+        assertCanView(submission, principal);
         return scoreRepository.findBySubmissionId(submissionId).stream()
                 .map(ScoreResponse::from).collect(Collectors.toList());
+    }
+
+    private void assertCanView(Submission submission, AuthenticatedPrincipal principal) {
+        if (principal.isCoordinator()) {
+            return;
+        }
+        UUID roundId = submission.getRound().getId();
+        if (judgeAssignmentService.isJudgeAssignedToRound(principal.userId(), roundId)) {
+            return;
+        }
+        Team team = submission.getTeam();
+        boolean isTeamMember = teamMemberRepository.existsByTeamIdAndUserId(team.getId(), principal.userId());
+        if (isTeamMember && submission.getRound().isResultsPublished()) {
+            return;
+        }
+        if (team.getTrack() != null
+                && principal.hasRoleInScope(RoleName.MENTOR, ScopeType.TRACK, team.getTrack().getId())
+                && submission.getRound().isResultsPublished()) {
+            return;
+        }
+        throw ApiException.forbidden("Bạn không có quyền xem điểm của bài nộp này");
     }
 
     private void validateScoreRange(ScoreItemRequest item, Criterion criterion) {

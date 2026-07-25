@@ -12,19 +12,25 @@
 	<artifactId>hackathon-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>hackathon-backend</name>
-	<description/>
-	<url/>
+	<description>Backend API cho hệ thống quản lý và chấm điểm cuộc thi hackathon Seal</description>
+	<url>https://github.com/BryannLee202/Seal_Hackathon_Webapp</url>
 	<licenses>
-		<license/>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
 	</licenses>
 	<developers>
-		<developer/>
+		<developer>
+			<name>Seal Hackathon Team</name>
+			<url>https://github.com/BryannLee202/Seal_Hackathon_Webapp</url>
+		</developer>
 	</developers>
 	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
+		<connection>scm:git:https://github.com/BryannLee202/Seal_Hackathon_Webapp.git</connection>
+		<developerConnection>scm:git:https://github.com/BryannLee202/Seal_Hackathon_Webapp.git</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/BryannLee202/Seal_Hackathon_Webapp</url>
 	</scm>
 	<properties>
 		<java.version>21</java.version>

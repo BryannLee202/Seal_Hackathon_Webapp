@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../api/client";
-import type { CriterionItem, JudgeType, RankingItem, RoundItem, SubmissionItem, VarianceStat } from "../../api/types";
+import type { CriterionItem, JudgeType, Page, RankingItem, RoundItem, SubmissionItem, VarianceStat } from "../../api/types";
 import { PersonPicker } from "../../components/PersonPicker";
 
 const BFF_URL = import.meta.env.VITE_BFF_URL ?? "http://localhost:4001";
@@ -19,11 +19,11 @@ export function RoundPanel({ round, rblEnabled }: { round: RoundItem; rblEnabled
   async function load() {
     const [c, s, r] = await Promise.all([
       api.get<CriterionItem[]>(`/api/rounds/${round.id}/criteria`),
-      api.get<SubmissionItem[]>(`/api/rounds/${round.id}/submissions`),
+      api.get<Page<SubmissionItem>>(`/api/rounds/${round.id}/submissions`),
       api.get<RankingItem[]>(`/api/rounds/${round.id}/rankings`),
     ]);
     setCriteria(c.data);
-    setSubmissions(s.data);
+    setSubmissions(s.data.content);
     setRankings(r.data);
     if (rblEnabled) {
       const v = await api.get<VarianceStat[]>(`/api/rounds/${round.id}/rbl/variance`);

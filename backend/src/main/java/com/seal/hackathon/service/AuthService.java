@@ -18,6 +18,8 @@ import com.seal.hackathon.repository.UserRepository;
 import com.seal.hackathon.repository.UserRoleAssignmentRepository;
 import com.seal.hackathon.security.AuthenticatedPrincipal;
 import com.seal.hackathon.security.JwtService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,17 +118,15 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserSummaryResponse> listPending() {
-        return userRepository.findByAccountStatus(AccountStatus.PENDING).stream()
-                .map(UserSummaryResponse::from)
-                .collect(Collectors.toList());
+    public Page<UserSummaryResponse> listPending(Pageable pageable) {
+        return userRepository.findByAccountStatus(AccountStatus.PENDING, pageable)
+                .map(UserSummaryResponse::from);
     }
 
     @Transactional(readOnly = true)
-    public List<UserSummaryResponse> listApproved() {
-        return userRepository.findByAccountStatus(AccountStatus.APPROVED).stream()
-                .map(UserSummaryResponse::from)
-                .collect(Collectors.toList());
+    public Page<UserSummaryResponse> listApproved(Pageable pageable) {
+        return userRepository.findByAccountStatus(AccountStatus.APPROVED, pageable)
+                .map(UserSummaryResponse::from);
     }
 
     private static final SecureRandom RANDOM = new SecureRandom();

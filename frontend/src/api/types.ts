@@ -1,3 +1,11 @@
+export interface Page<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
+
 export type RoleName = "TEAM_MEMBER" | "TEAM_LEADER" | "MENTOR" | "JUDGE" | "COORDINATOR";
 export type ScopeType = "GLOBAL" | "EVENT" | "TRACK" | "ROUND";
 export type JudgeType = "INTERNAL" | "GUEST";

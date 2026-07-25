@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api/client";
-import type { UserSummary } from "../api/types";
+import type { Page, UserSummary } from "../api/types";
 
 /**
  * Searchable dropdown over approved users - lets Coordinator pick a person by
@@ -20,7 +20,7 @@ export function PersonPicker({
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    api.get<UserSummary[]>("/api/admin/users/approved").then((res) => setUsers(res.data));
+    api.get<Page<UserSummary>>("/api/admin/users/approved").then((res) => setUsers(res.data.content));
   }, []);
 
   const selected = users.find((u) => u.id === value) ?? null;
