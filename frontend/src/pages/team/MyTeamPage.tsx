@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 import type { EventItem, RoundItem, SubmissionItem, TeamInviteItem, TeamItem, TrackItem } from "../../api/types";
+import { Wizard, type WizardStep } from "../../components/Wizard";
 
 export function MyTeamPage() {
   const { user, refreshPermissions } = useAuth();
@@ -268,6 +269,7 @@ function SubmissionForm({ teamId, round, canEdit }: { teamId: string; round: Rou
   const [docUrl, setDocUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     api
@@ -281,19 +283,68 @@ function SubmissionForm({ teamId, round, canEdit }: { teamId: string; round: Rou
       .catch(() => setExisting(null));
   }, [teamId, round.id]);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit() {
     setError(null);
     setMessage(null);
+    setSubmitting(true);
     try {
       await api.put(`/api/teams/${teamId}/rounds/${round.id}/submission`, { repoUrl, demoUrl, docUrl });
       setMessage("Đã nộp bài thành công.");
     } catch (err) {
       setError((err as Error).message);
+    } finally {
+      setSubmitting(false);
     }
   }
 
   const deadlinePassed = new Date(round.submissionDeadline) < new Date();
+
+  const steps: WizardStep[] = [
+    {
+      title: "Repository",
+      validate: () => (repoUrl.trim() ? null : "Vui lòng nhập URL repository"),
+      content: (
+        <div className="form-row">
+          <label>Repository URL</label>
+          <input
+            required
+            type="url"
+            placeholder="https://github.com/ten-doi/du-an"
+            value={repoUrl}
+            onChange={(e) => setRepoUrl(e.target.value)}
+          />
+        </div>
+      ),
+    },
+    {
+      title: "Demo",
+      content: (
+        <div className="form-row">
+          <label>Demo URL (nếu có)</label>
+          <input
+            type="url"
+            placeholder="https://ten-doi.vercel.app"
+            value={demoUrl}
+            onChange={(e) => setDemoUrl(e.target.value)}
+          />
+        </div>
+      ),
+    },
+    {
+      title: "Tài liệu",
+      content: (
+        <div className="form-row">
+          <label>Slide/Báo cáo URL (nếu có)</label>
+          <input
+            type="url"
+            placeholder="https://drive.google.com/..."
+            value={docUrl}
+            onChange={(e) => setDocUrl(e.target.value)}
+          />
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className="card" style={{ background: "var(--color-bg)" }}>
@@ -309,25 +360,17 @@ function SubmissionForm({ teamId, round, canEdit }: { teamId: string; round: Rou
         <div className="muted section-gap">
           {existing ? "Đội trưởng đã nộp bài cho vòng này." : "Chưa nộp bài. Chỉ đội trưởng có thể nộp bài."}
         </div>
+      ) : deadlinePassed ? (
+        <div className="muted section-gap">Đã quá hạn nộp bài.</div>
       ) : (
-        <form onSubmit={submit} className="section-gap">
-          <div className="form-row">
-            <label>Repository URL</label>
-            <input required type="url" value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)} />
-          </div>
-          <div className="form-row">
-            <label>Demo URL</label>
-            <input type="url" value={demoUrl} onChange={(e) => setDemoUrl(e.target.value)} />
-          </div>
-          <div className="form-row">
-            <label>Slide/Báo cáo URL</label>
-            <input type="url" value={docUrl} onChange={(e) => setDocUrl(e.target.value)} />
-          </div>
-          <button className="btn small" type="submit" disabled={deadlinePassed} style={{ alignSelf: "flex-start" }}>
-            {existing ? "Cập nhật bài nộp" : "Nộp bài"}
-          </button>
-          {deadlinePassed && <div className="muted">Đã quá hạn nộp bài.</div>}
-        </form>
+        <div className="section-gap">
+          <Wizard
+            steps={steps}
+            onSubmit={submit}
+            submitting={submitting}
+            submitLabel={existing ? "Cập nhật bài nộp" : "Nộp bài"}
+          />
+        </div>
       )}
     </div>
   );
