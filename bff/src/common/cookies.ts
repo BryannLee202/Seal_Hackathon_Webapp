@@ -9,7 +9,11 @@ export function setAuthCookies(res: Response, accessToken: string, refreshToken:
   const commonOptions = {
     httpOnly: true,
     secure: isProd,
-    sameSite: "lax" as const,
+    // Frontend and BFF live on different onrender.com subdomains in production, which
+    // browsers treat as cross-site - SameSite=Lax cookies are dropped on those requests.
+    // Locally both run on localhost (different ports only), which is still same-site, so
+    // Lax is fine there and doesn't require HTTPS.
+    sameSite: (isProd ? "none" : "lax") as "none" | "lax",
     path: "/",
   };
   res.cookie(ACCESS_TOKEN_COOKIE, accessToken, { ...commonOptions, maxAge: 60 * 60 * 1000 });
