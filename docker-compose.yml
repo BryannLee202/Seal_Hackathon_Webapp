@@ -16,15 +16,23 @@ services:
   backend:
     build: ./backend
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       DB_URL: jdbc:postgresql://postgres:5432/seal_hackathon
       DB_USERNAME: seal_admin
       DB_PASSWORD: seal_password
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in a root .env file first — see .env.example}
       CORS_ALLOWED_ORIGINS: http://localhost:3000
     ports:
       - "8080:8080"
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
 
   bff:
     build: ./bff
@@ -36,7 +44,14 @@ services:
     ports:
       - "4001:4001"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
 
   frontend:
     build:
@@ -46,7 +61,8 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - bff
+      bff:
+        condition: service_healthy
 
 volumes:
   postgres_data:

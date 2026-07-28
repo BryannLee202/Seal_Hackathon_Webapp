@@ -29,7 +29,7 @@ BFF tồn tại để trình duyệt không bao giờ thấy JWT trực tiếp �
 
 Xem hướng dẫn chi tiết từng phần:
 - [backend/README.md](backend/README.md) — cấu hình, biến môi trường, cách chạy, test
-- `bff/` — `npm install && npm run build && npm start` (cần biến `BACKEND_URL`, `CORS_ALLOWED_ORIGINS`)
+- [bff/README.md](bff/README.md) — kiến trúc, biến môi trường, route map, cookie/CSRF, cách chạy, test
 - `frontend/` — `npm install && npm run dev` (cần biến `VITE_BFF_URL`)
 
 Hoặc chạy toàn bộ bằng Docker Compose (đã có `postgres` + `backend` + `bff` + `frontend`):
