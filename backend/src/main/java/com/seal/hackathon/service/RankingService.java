@@ -13,6 +13,7 @@ import com.seal.hackathon.repository.DisqualificationRepository;
 import com.seal.hackathon.repository.RankingRepository;
 import com.seal.hackathon.repository.ScoreRepository;
 import com.seal.hackathon.repository.SubmissionRepository;
+import com.seal.hackathon.security.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -127,7 +128,8 @@ public class RankingService {
     }
 
     @Transactional(readOnly = true)
-    public List<RankingResponse> list(UUID roundId) {
+    public List<RankingResponse> list(UUID roundId, AuthenticatedPrincipal principal) {
+        roundService.findOrThrowVisibleForRankings(roundId, principal);
         return rankingRepository.findByRoundIdOrderByRankOverallAsc(roundId).stream()
                 .map(RankingResponse::from).collect(Collectors.toList());
     }

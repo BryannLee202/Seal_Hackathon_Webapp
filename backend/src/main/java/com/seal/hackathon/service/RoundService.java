@@ -10,6 +10,7 @@ import com.seal.hackathon.dto.event.RoundResponse;
 import com.seal.hackathon.exception.ApiException;
 import com.seal.hackathon.repository.CriterionRepository;
 import com.seal.hackathon.repository.RoundRepository;
+import com.seal.hackathon.security.AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,5 +98,18 @@ public class RoundService {
     Round findOrThrow(UUID roundId) {
         return roundRepository.findById(roundId)
                 .orElseThrow(() -> ApiException.notFound("Không tìm thấy vòng thi"));
+    }
+
+    /**
+     * Same lookup as findOrThrow, but also enforces that non-coordinators may only see a round's
+     * rankings once results are published — mirrors the visibility rule ScoreService applies to
+     * individual scores. Coordinators always have full access.
+     */
+    Round findOrThrowVisibleForRankings(UUID roundId, AuthenticatedPrincipal principal) {
+        Round round = findOrThrow(roundId);
+        if (!principal.isCoordinator() && !round.isResultsPublished()) {
+            throw ApiException.forbidden("Bảng xếp hạng của vòng thi này chưa được công bố");
+        }
+        return round;
     }
 }

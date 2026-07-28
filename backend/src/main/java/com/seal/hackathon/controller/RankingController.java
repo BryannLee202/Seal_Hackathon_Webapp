@@ -27,7 +27,7 @@ public class RankingController {
     }
 
     @GetMapping
-    public List<RankingResponse> list(@PathVariable UUID roundId) {
-        return rankingService.list(roundId);
+    public List<RankingResponse> list(@PathVariable UUID roundId, @AuthenticationPrincipal AuthenticatedPrincipal principal) {
+        return rankingService.list(roundId, principal);
     }
 }

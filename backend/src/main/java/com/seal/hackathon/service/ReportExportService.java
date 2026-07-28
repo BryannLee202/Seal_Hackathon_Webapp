@@ -2,6 +2,7 @@ package com.seal.hackathon.service;
 
 import com.seal.hackathon.domain.entity.Ranking;
 import com.seal.hackathon.repository.RankingRepository;
+import com.seal.hackathon.security.AuthenticatedPrincipal;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -18,13 +19,16 @@ import java.util.UUID;
 public class ReportExportService {
 
     private final RankingRepository rankingRepository;
+    private final RoundService roundService;
 
-    public ReportExportService(RankingRepository rankingRepository) {
+    public ReportExportService(RankingRepository rankingRepository, RoundService roundService) {
         this.rankingRepository = rankingRepository;
+        this.roundService = roundService;
     }
 
     @Transactional(readOnly = true)
-    public byte[] exportRankingExcel(UUID roundId) {
+    public byte[] exportRankingExcel(UUID roundId, AuthenticatedPrincipal principal) {
+        roundService.findOrThrowVisibleForRankings(roundId, principal);
         List<Ranking> rankings = rankingRepository.findByRoundIdOrderByRankOverallAsc(roundId);
 
         try (XSSFWorkbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
