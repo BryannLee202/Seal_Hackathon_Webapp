@@ -1,11 +1,12 @@
 import { HttpService } from "@nestjs/axios";
-import { HttpException, Injectable } from "@nestjs/common";
+import { HttpException, Injectable, Logger } from "@nestjs/common";
 import { AxiosError, Method } from "axios";
 import { firstValueFrom } from "rxjs";
 
 @Injectable()
 export class ProxyService {
   private readonly backendUrl = process.env.BACKEND_URL ?? "http://localhost:8080";
+  private readonly logger = new Logger(ProxyService.name);
 
   constructor(private readonly http: HttpService) {}
 
@@ -24,8 +25,10 @@ export class ProxyService {
     } catch (err) {
       const axiosErr = err as AxiosError;
       if (axiosErr.response) {
+        this.logger.warn(`Backend ${method.toString().toUpperCase()} ${path} -> ${axiosErr.response.status}`);
         throw new HttpException(axiosErr.response.data as object, axiosErr.response.status);
       }
+      this.logger.error(`Backend unreachable for ${method.toString().toUpperCase()} ${path}: ${axiosErr.message}`);
       throw new HttpException({ message: "Backend unreachable" }, 502);
     }
   }
@@ -45,8 +48,10 @@ export class ProxyService {
     } catch (err) {
       const axiosErr = err as AxiosError;
       if (axiosErr.response) {
+        this.logger.warn(`Backend ${method.toString().toUpperCase()} ${path} -> ${axiosErr.response.status}`);
         throw new HttpException(axiosErr.response.data as object, axiosErr.response.status);
       }
+      this.logger.error(`Backend unreachable for ${method.toString().toUpperCase()} ${path}: ${axiosErr.message}`);
       throw new HttpException({ message: "Backend unreachable" }, 502);
     }
   }

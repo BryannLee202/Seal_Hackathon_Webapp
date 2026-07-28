@@ -1,11 +1,12 @@
 import { HttpService } from "@nestjs/axios";
-import { HttpException, Injectable } from "@nestjs/common";
+import { HttpException, Injectable, Logger } from "@nestjs/common";
 import { AxiosError } from "axios";
 import { firstValueFrom } from "rxjs";
 
 @Injectable()
 export class AuthService {
   private readonly backendUrl = process.env.BACKEND_URL ?? "http://localhost:8080";
+  private readonly logger = new Logger(AuthService.name);
 
   constructor(private readonly http: HttpService) {}
 
@@ -38,6 +39,11 @@ export class AuthService {
       return response.data;
     } catch (err) {
       const axiosErr = err as AxiosError;
+      if (axiosErr.response) {
+        this.logger.warn(`Backend ${method.toUpperCase()} ${path} -> ${axiosErr.response.status}`);
+      } else {
+        this.logger.error(`Backend unreachable for ${method.toUpperCase()} ${path}: ${axiosErr.message}`);
+      }
       throw new HttpException(
         axiosErr.response?.data ?? { message: "Backend unreachable" },
         axiosErr.response?.status ?? 502,
