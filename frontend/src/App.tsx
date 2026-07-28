@@ -14,6 +14,7 @@ import { MyTeamPage } from "./pages/team/MyTeamPage";
 import { JudgePage } from "./pages/judge/JudgePage";
 import { RankingPage } from "./pages/public/RankingPage";
 import { VotingPage } from "./pages/public/VotingPage";
+import { NotFoundPage } from "./pages/NotFound";
 import { ToastContainer } from "./components/Toast";
 
 export default function App() {
@@ -99,6 +100,8 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

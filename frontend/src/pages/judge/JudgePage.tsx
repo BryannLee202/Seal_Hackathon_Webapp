@@ -72,7 +72,7 @@ function CalibrationJudgeSection({ roundIds }: { roundIds: string[] }) {
         }),
       );
       setCalibrationRounds(withCriteria);
-    })();
+    })().catch((err) => toast.error((err as Error).message));
   }, [roundIds]);
 
   if (rounds.length === 0) return null;
@@ -149,7 +149,7 @@ function RoundScoringSection({ roundId }: { roundId: string }) {
   }
 
   useEffect(() => {
-    load();
+    load().catch((err) => toast.error((err as Error).message));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundId]);
 

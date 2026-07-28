@@ -82,8 +82,6 @@ export function VotingPage() {
       );
       toast.success(`Đã bình chọn cho "${teamName}"!`);
     } catch (err) {
-      localStorage.setItem(votedKey(trackId), teamId);
-      setVotedTeamId(teamId);
       toast.error((err as Error).message);
     }
   }

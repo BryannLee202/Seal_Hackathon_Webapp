@@ -11,6 +11,7 @@ const base = {
   strokeWidth: 2,
   strokeLinecap: "round" as const,
   strokeLinejoin: "round" as const,
+  "aria-hidden": true,
 };
 
 export function IconHome(props: IconProps) {

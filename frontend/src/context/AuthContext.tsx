@@ -1,5 +1,15 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { api } from "../api/client";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { useNavigate } from "react-router-dom";
+import { api, onUnauthorized } from "../api/client";
 import type { CurrentUser, RoleName } from "../api/types";
 
 interface AuthContextValue {
@@ -17,6 +27,12 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const userRef = useRef<CurrentUser | null>(null);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
 
   const refreshUser = useCallback(async () => {
     try {
@@ -30,6 +46,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     refreshUser().finally(() => setLoading(false));
   }, [refreshUser]);
+
+  // Only bounce to /login when a session that WAS logged in goes stale (cookie expired
+  // mid-use) - anonymous visitors on public pages get a 401 from /api/auth/me on first
+  // load too, and they shouldn't be redirected anywhere for that.
+  useEffect(() => {
+    return onUnauthorized(() => {
+      const wasLoggedIn = userRef.current !== null;
+      setUser(null);
+      if (wasLoggedIn) {
+        navigate("/login", { replace: true });
+      }
+    });
+  }, [navigate]);
 
   const login = useCallback(
     async (email: string, password: string) => {
