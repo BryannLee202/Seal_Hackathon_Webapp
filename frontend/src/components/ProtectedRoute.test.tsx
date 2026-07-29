@@ -2,9 +2,9 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import { ProtectedRoute } from "./ProtectedRoute";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
-vi.mock("../context/AuthContext", () => ({
+vi.mock("../context/useAuth", () => ({
   useAuth: vi.fn(),
 }));
 

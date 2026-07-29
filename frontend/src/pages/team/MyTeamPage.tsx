@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../api/client";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 import type { EventItem, RoundItem, SubmissionItem, TeamInviteItem, TeamItem, TrackItem } from "../../api/types";
 import { Wizard, type WizardStep } from "../../components/Wizard";
 import { FeedbackThread } from "../../components/FeedbackThread";

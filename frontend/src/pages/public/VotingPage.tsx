@@ -6,7 +6,7 @@ import { IconHeart, IconSparkles } from "../../components/icons";
 import { TiltCard } from "../../components/TiltCard";
 import { CountUp } from "../../components/CountUp";
 import { EmptyState } from "../../components/EmptyState";
-import { toast } from "../../components/Toast";
+import { toast } from "../../lib/toast";
 
 const POLL_INTERVAL_MS = 15000;
 

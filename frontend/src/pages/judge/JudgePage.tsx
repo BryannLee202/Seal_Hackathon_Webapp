@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../api/client";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 import type {
   CalibrationRoundItem,
   CriterionItem,
@@ -10,7 +10,7 @@ import type {
   SubmissionItem,
 } from "../../api/types";
 import { EmptyState } from "../../components/EmptyState";
-import { toast } from "../../components/Toast";
+import { toast } from "../../lib/toast";
 import { ScoreSlider } from "../../components/ScoreSlider";
 
 export function JudgePage() {

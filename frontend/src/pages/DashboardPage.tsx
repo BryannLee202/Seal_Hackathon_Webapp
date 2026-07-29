@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import type { RoleName } from "../api/types";
 import { IconCalendar, IconGavel, IconShieldCheck, IconUsers } from "../components/icons";
 import type { ReactNode } from "react";
