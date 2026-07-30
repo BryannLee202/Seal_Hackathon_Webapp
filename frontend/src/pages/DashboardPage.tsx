@@ -26,6 +26,7 @@ export function DashboardPage() {
 
   const isCoordinator = hasRole("COORDINATOR");
   const isJudge = hasRole("JUDGE");
+  const isMentor = hasRole("MENTOR");
   const isTeam = hasRole("TEAM_MEMBER") || hasRole("TEAM_LEADER");
 
   return (
@@ -38,9 +39,11 @@ export function DashboardPage() {
               ? "Tổng quan Ban tổ chức"
               : isJudge
                 ? "Tổng quan chấm điểm"
-                : isTeam
-                  ? "Tổng quan đội thi"
-                  : "Đây là vai trò hiện tại của bạn trong hệ thống"}
+                : isMentor
+                  ? "Tổng quan Mentor"
+                  : isTeam
+                    ? "Tổng quan đội thi"
+                    : "Đây là vai trò hiện tại của bạn trong hệ thống"}
           </p>
         </div>
         <button className="btn secondary small" onClick={refreshPermissions}>
@@ -52,6 +55,8 @@ export function DashboardPage() {
         <CoordinatorOverview />
       ) : isJudge ? (
         <JudgeOverview />
+      ) : isMentor ? (
+        <MentorOverview />
       ) : isTeam ? (
         <TeamOverview />
       ) : (
@@ -517,6 +522,131 @@ function TeamOverview() {
             ))}
             <Link className="dashboard-activity-more" to="/my-team">
               Xem toàn bộ trao đổi →
+            </Link>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+interface MentorSummary {
+  teams: TeamItem[];
+  threads: { team: TeamItem; messages: FeedbackMessageItem[] }[];
+}
+
+function MentorOverview() {
+  const [summary, setSummary] = useState<MentorSummary | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const teamsRes = await api.get<TeamItem[]>("/api/mentor/teams");
+      const teams = teamsRes.data;
+      const threads = await Promise.all(
+        teams.map(async (team) => {
+          const res = await api.get<FeedbackMessageItem[]>(`/api/teams/${team.id}/messages`);
+          return { team, messages: res.data };
+        }),
+      );
+      setSummary({ teams, threads });
+    })().catch((err) => toast.error((err as Error).message));
+  }, []);
+
+  const priorityItems: PriorityItem[] = [];
+  if (summary) {
+    if (summary.teams.length === 0) {
+      priorityItems.push({
+        key: "no-teams",
+        tone: "info",
+        text: "Chưa được phân công Hạng mục nào",
+        to: "/mentor",
+      });
+    }
+    for (const { team, messages } of summary.threads) {
+      const last = messages[messages.length - 1];
+      if (last && last.authorRole === "TEAM_MEMBER") {
+        priorityItems.push({
+          key: `awaiting-${team.id}`,
+          tone: "warning",
+          text: `Đội "${team.name}" đang chờ phản hồi của bạn`,
+          to: "/mentor",
+        });
+      }
+    }
+  }
+
+  const metrics = summary
+    ? [
+        { label: "Đội được phân công", value: summary.teams.length },
+        {
+          label: "Cần phản hồi",
+          value: summary.threads.filter((t) => {
+            const last = t.messages[t.messages.length - 1];
+            return last && last.authorRole === "TEAM_MEMBER";
+          }).length,
+        },
+        { label: "Tổng thành viên", value: summary.teams.reduce((sum, t) => sum + t.members.length, 0) },
+        { label: "Tổng trao đổi", value: summary.threads.reduce((sum, t) => sum + t.messages.length, 0) },
+      ]
+    : null;
+
+  const recent = summary
+    ? summary.threads
+        .flatMap((t) => t.messages.map((m) => ({ ...m, teamName: t.team.name })))
+        .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+        .slice(0, 5)
+    : [];
+
+  return (
+    <>
+      <div className="dashboard-section-label">Cần chú ý</div>
+      {!summary ? (
+        <div className="dashboard-priority-empty">Đang tải...</div>
+      ) : priorityItems.length === 0 ? (
+        <div className="dashboard-priority-empty">Không có việc gì cần xử lý gấp. Mọi thứ đang ổn.</div>
+      ) : (
+        <div className="dashboard-priority">
+          {priorityItems.map((item) => (
+            <Link key={item.key} to={item.to} className="dashboard-priority-item">
+              <span className={`dashboard-priority-dot ${item.tone}`} />
+              <span className="dashboard-priority-text">{item.text}</span>
+              <IconArrowRight width={14} height={14} />
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <div className="dashboard-section-label">Tổng quan</div>
+      {metrics && (
+        <div className="dashboard-metrics">
+          {metrics.map((m) => (
+            <div className="dashboard-metric" key={m.label}>
+              <div className="dashboard-metric-value">{m.value}</div>
+              <div className="dashboard-metric-label">{m.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="dashboard-section-label">Hoạt động gần đây</div>
+      <div className="card">
+        {!summary ? (
+          <div className="muted">Đang tải...</div>
+        ) : recent.length === 0 ? (
+          <div className="muted">Chưa có hoạt động nào.</div>
+        ) : (
+          <>
+            {recent.map((m) => (
+              <div className="dashboard-activity-item" key={m.id}>
+                <span>
+                  {m.authorRole === "MENTOR" ? "Bạn" : `Đội ${m.teamName}`} ·{" "}
+                  <span className="muted">{m.body.length > 60 ? `${m.body.slice(0, 60)}…` : m.body}</span>
+                </span>
+                <time>{new Date(m.createdAt).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" })}</time>
+              </div>
+            ))}
+            <Link className="dashboard-activity-more" to="/mentor">
+              Xem tất cả đội được phân công →
             </Link>
           </>
         )}
