@@ -11,7 +11,7 @@ export function DashboardPage() {
     <div>
       <div className="topbar">
         <div>
-          <h1 className="page-title">Xin chào, {user?.fullName} 👋</h1>
+          <h1 className="page-title">Xin chào, {user?.fullName}</h1>
           <p className="page-subtitle">Đây là vai trò hiện tại của bạn trong hệ thống</p>
         </div>
         <button className="btn secondary small" onClick={refreshPermissions}>

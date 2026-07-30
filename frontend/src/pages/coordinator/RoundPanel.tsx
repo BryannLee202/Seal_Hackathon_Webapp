@@ -142,7 +142,7 @@ export function RoundPanel({ round, rblEnabled }: { round: RoundItem; rblEnabled
                         Demo
                       </a>
                     ) : (
-                      "—"
+                      "-"
                     )}
                   </td>
                   <td className="muted">{new Date(s.submittedAt).toLocaleString("vi-VN")}</td>
@@ -190,10 +190,10 @@ export function RoundPanel({ round, rblEnabled }: { round: RoundItem; rblEnabled
                 <tr key={r.teamId}>
                   <td>{r.rankOverall}</td>
                   <td>{r.teamName}</td>
-                  <td>{r.trackName ?? "—"}</td>
+                  <td>{r.trackName ?? "-"}</td>
                   <td>{r.totalWeightedScore}</td>
-                  <td>{r.rankInTrack ?? "—"}</td>
-                  <td>{r.promoted ? <span className="badge success">Có</span> : <span className="muted">—</span>}</td>
+                  <td>{r.rankInTrack ?? "-"}</td>
+                  <td>{r.promoted ? <span className="badge success">Có</span> : <span className="muted">-</span>}</td>
                 </tr>
               ))}
             </tbody>
@@ -227,10 +227,10 @@ export function RoundPanel({ round, rblEnabled }: { round: RoundItem; rblEnabled
                   <tr key={v.criterionId}>
                     <td>{v.criterionName}</td>
                     <td>{v.sampleCount}</td>
-                    <td>{v.mean ?? "—"}</td>
-                    <td>{v.stdDev ?? "—"}</td>
+                    <td>{v.mean ?? "-"}</td>
+                    <td>{v.stdDev ?? "-"}</td>
                     <td>
-                      {v.min ?? "—"} - {v.max ?? "—"}
+                      {v.min ?? "-"} - {v.max ?? "-"}
                     </td>
                   </tr>
                 ))}

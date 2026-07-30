@@ -98,7 +98,7 @@ export function TracksTab({ eventId }: { eventId: string }) {
               {tracks.map((t) => (
                 <tr key={t.id}>
                   <td>{t.name}</td>
-                  <td className="muted">{t.description ?? "—"}</td>
+                  <td className="muted">{t.description ?? "-"}</td>
                   <td>{t.maxTeams ?? "Không giới hạn"}</td>
                   <td>
                     <div className="flex">

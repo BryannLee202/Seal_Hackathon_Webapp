@@ -115,15 +115,15 @@ export function RankingPage() {
                     {r.rankOverall != null && r.rankOverall <= 3 ? (
                       <span className={`rank-medal ${MEDALS[r.rankOverall - 1]}`}>{r.rankOverall}</span>
                     ) : (
-                      <strong>{r.rankOverall ?? "—"}</strong>
+                      <strong>{r.rankOverall ?? "-"}</strong>
                     )}
                   </td>
                   <td>{r.teamName}</td>
-                  <td>{r.trackName ?? "—"}</td>
-                  <td>{r.rankInTrack ?? "—"}</td>
+                  <td>{r.trackName ?? "-"}</td>
+                  <td>{r.rankInTrack ?? "-"}</td>
                   <td>{r.totalWeightedScore}</td>
                   <td>
-                    {r.promoted ? <span className="badge success">Thăng vòng</span> : <span className="muted">—</span>}
+                    {r.promoted ? <span className="badge success">Thăng vòng</span> : <span className="muted">-</span>}
                   </td>
                 </tr>
               ))}

@@ -172,7 +172,7 @@ export function EventsPage() {
                   <td>
                     <span className={`badge ${statusBadge[ev.status]}`}>{statusLabel[ev.status]}</span>
                   </td>
-                  <td>{ev.rblEnabled ? <span className="badge primary">Có</span> : <span className="muted">—</span>}</td>
+                  <td>{ev.rblEnabled ? <span className="badge primary">Có</span> : <span className="muted">-</span>}</td>
                   <td>
                     <select
                       value={ev.status}

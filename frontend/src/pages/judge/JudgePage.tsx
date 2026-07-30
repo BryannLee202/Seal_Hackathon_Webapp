@@ -79,7 +79,7 @@ function CalibrationJudgeSection({ roundIds }: { roundIds: string[] }) {
 
   return (
     <div className="card" style={{ borderLeft: "4px solid var(--color-primary)" }}>
-      <div className="card-title">Vòng hiệu chuẩn (Calibration) — Nghiên cứu RBL</div>
+      <div className="card-title">Vòng hiệu chuẩn (Calibration): nghiên cứu RBL</div>
       <p className="muted" style={{ marginBottom: 14 }}>
         Chấm bài mẫu dưới đây trước khi chấm chính thức để đối chiếu mức độ đồng thuận với các giám khảo khác.
       </p>

@@ -86,11 +86,11 @@ export function UsersApprovalPage() {
         <div className="card-title">Tạo tài khoản Giám khảo khách mời</div>
         <p className="muted" style={{ marginBottom: 14 }}>
           Tài khoản tạm thời, được phê duyệt sẵn, chỉ dùng để chấm điểm các vòng thi được phân công. Mật khẩu tạm
-          thời sẽ chỉ hiển thị một lần — hãy gửi lại cho giám khảo qua kênh riêng.
+          thời sẽ chỉ hiển thị một lần, hãy gửi lại cho giám khảo qua kênh riêng.
         </p>
         {createdGuest && (
           <div className="alert success">
-            Đã tạo tài khoản <strong>{createdGuest.email}</strong> — mật khẩu tạm:{" "}
+            Đã tạo tài khoản <strong>{createdGuest.email}</strong>, mật khẩu tạm:{" "}
             <code style={{ fontWeight: 700 }}>{createdGuest.temporaryPassword}</code>
           </div>
         )}
@@ -137,8 +137,8 @@ export function UsersApprovalPage() {
                   <td>{u.fullName}</td>
                   <td>{u.email}</td>
                   <td>{categoryLabel[u.userCategory] ?? u.userCategory}</td>
-                  <td>{u.studentCode ?? "—"}</td>
-                  <td>{u.schoolName ?? "—"}</td>
+                  <td>{u.studentCode ?? "-"}</td>
+                  <td>{u.schoolName ?? "-"}</td>
                   <td>
                     <div className="flex">
                       <button className="btn small" onClick={() => approve(u.id, true)}>

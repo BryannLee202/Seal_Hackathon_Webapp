@@ -91,7 +91,7 @@ export function AuditLogPage() {
       <div className="topbar">
         <div>
           <h1 className="page-title">Nhật ký kiểm tra</h1>
-          <p className="page-subtitle">Toàn bộ hành động chấm điểm, phê duyệt, loại đội — minh bạch, không thể sửa</p>
+          <p className="page-subtitle">Toàn bộ hành động chấm điểm, phê duyệt, loại đội: minh bạch, không thể sửa</p>
         </div>
       </div>
 

@@ -127,7 +127,7 @@ export function PrizesTab({ eventId }: { eventId: string }) {
             {prizes.map((p) => (
               <tr key={p.id}>
                 <td>{p.name}</td>
-                <td>{p.trackId ? tracks.find((t) => t.id === p.trackId)?.name ?? "—" : "Toàn sự kiện"}</td>
+                <td>{p.trackId ? tracks.find((t) => t.id === p.trackId)?.name ?? "-" : "Toàn sự kiện"}</td>
                 <td>#{p.rankCondition}</td>
                 <td>{p.awardedTeamName ?? <span className="muted">Chưa gán</span>}</td>
               </tr>
