@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { BrandMark } from "./BrandMark";
 import {
   IconCalendar,
   IconGavel,
@@ -61,7 +62,9 @@ export function Layout({ children }: { children: ReactNode }) {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <div className="sidebar-brand-mark">SH</div>
+          <div className="sidebar-brand-mark">
+            <BrandMark size={22} />
+          </div>
           <div className="sidebar-brand-text">
             SEAL Hackathon
             <small>Quản lý cuộc thi</small>

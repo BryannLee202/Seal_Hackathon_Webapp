@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { IconArrowRight, IconCalendar, IconGavel, IconTrophy } from "../components/icons";
+import { BrandMark } from "../components/BrandMark";
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -66,13 +67,15 @@ export function AuthHero() {
   return (
     <div className="auth-hero">
       <div className="auth-hero-content">
-        <div className="auth-hero-brand">
-          <div className="auth-hero-mark">🏆</div>
+        <Link className="auth-hero-brand" to="/">
+          <div className="auth-hero-mark">
+            <BrandMark size={20} />
+          </div>
           SEAL Hackathon
-        </div>
+        </Link>
         <div className="auth-hero-title">Điều phối cuộc thi hackathon, minh bạch từ vòng loại đến chung kết.</div>
         <div className="auth-hero-subtitle">
-          Đăng ký đội thi, chấm điểm theo tiêu chí, xếp hạng tự động và nhật ký kiểm tra đầy đủ — tất cả trong một
+          Đăng ký đội thi, chấm điểm theo tiêu chí, xếp hạng tự động và nhật ký kiểm tra đầy đủ, tất cả trong một
           nền tảng duy nhất.
         </div>
       </div>

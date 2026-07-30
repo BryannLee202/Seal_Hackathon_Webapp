@@ -6,6 +6,7 @@ import { IconHeart, IconSparkles } from "../../components/icons";
 import { TiltCard } from "../../components/TiltCard";
 import { CountUp } from "../../components/CountUp";
 import { EmptyState } from "../../components/EmptyState";
+import { BrandMark } from "../../components/BrandMark";
 import { toast } from "../../lib/toast";
 
 const POLL_INTERVAL_MS = 15000;
@@ -91,7 +92,9 @@ export function VotingPage() {
       <header className="l-nav">
         <div className="l-container l-nav-inner">
           <Link className="l-nav-brand" to="/">
-            <div className="l-nav-mark">SH</div>
+            <div className="l-nav-mark">
+              <BrandMark size={18} />
+            </div>
             SEAL Hackathon
           </Link>
           <div className="l-nav-actions">
@@ -104,15 +107,13 @@ export function VotingPage() {
 
       <section className="l-hero" style={{ padding: "64px 0 40px" }}>
         <div className="l-hero-glow" />
-        <div className="l-container l-hero-inner">
+        <div className="l-container l-page-hero-inner">
           <div className="l-badge">
             <IconSparkles width={14} height={14} />
             Bình chọn khán giả
           </div>
           <h1 className="l-hero-title">
-            <span className="l-gradient-text">Giải được yêu thích</span>
-            <br />
-            do khán giả bình chọn
+            <span className="l-gradient-text">Giải được yêu thích</span> do khán giả bình chọn
           </h1>
           <p className="l-hero-subtitle">
             Theo dõi các đội thi và bình chọn cho đội bạn yêu thích nhất ở mỗi Hạng mục. Mỗi người chỉ được bình
@@ -197,7 +198,9 @@ export function VotingPage() {
       <footer className="l-footer">
         <div className="l-container l-footer-inner">
           <div className="l-footer-brand">
-            <div className="l-footer-mark">SH</div>
+            <div className="l-footer-mark">
+              <BrandMark size={18} />
+            </div>
             SEAL Hackathon
           </div>
           <div className="muted" style={{ fontSize: 13 }}>

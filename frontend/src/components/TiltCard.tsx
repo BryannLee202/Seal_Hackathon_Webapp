@@ -7,7 +7,7 @@ export function TiltCard({ children, className }: { children: ReactNode; classNa
   const glowX = useSpring(50, { stiffness: 300, damping: 30 });
   const glowY = useSpring(50, { stiffness: 300, damping: 30 });
   const transform = useMotionTemplate`perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-  const glowBackground = useMotionTemplate`radial-gradient(220px circle at ${glowX}% ${glowY}%, rgba(232, 121, 249, 0.16), transparent 70%)`;
+  const glowBackground = useMotionTemplate`radial-gradient(220px circle at ${glowX}% ${glowY}%, rgba(255, 122, 51, 0.18), transparent 70%)`;
 
   function handlePointerMove(e: PointerEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
